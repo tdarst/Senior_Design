@@ -38,6 +38,7 @@ def parse_add(address: str, tokens: dict, label_lookup: dict) -> str:
 
     return bin_string
 
+
 def parse_and(address: str, tokens: dict, label_lookup: dict) -> str: pass
 
 def parse_br(tokens: dict, label_lookup: dict) -> str: pass

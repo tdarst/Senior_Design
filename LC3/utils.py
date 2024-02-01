@@ -72,6 +72,7 @@ opcode_dictionary = {
     **PSEUDOS
 }
 
+KEY_ADDRESS = 'address'
 KEY_OPCODE = 'opcode'
 KEY_OPERANDS = 'operands'
 KEY_LABELS = 'labels'

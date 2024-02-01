@@ -1,7 +1,11 @@
 import parselib
 import utils
 import types
+from Class_Line import Line
 
+line = Class_Line()
+
+KEY_ADDRESS = utils.KEY_ADDRESS
 KEY_OPCODE = utils.KEY_OPCODE
 KEY_OPERANDS = utils.KEY_OPERANDS
 KEY_LABELS = utils.KEY_LABELS
@@ -45,6 +49,56 @@ PARSE_DICT = {
     '.BLKW': parselib.parse_blkw,
     '.STRINGZ': parselib.parse_stringz
 }
+
+def create_opcode_token_object(tok: str) -> object:
+    OPCODE_LENGTH = 4 
+    TOK_TYPE_OPCODE = 'opcode'
+    int_value = utils.OPCODE[tok]
+    hex_value = hex(int_value)
+    bin_value = utils.int_to_bin(int_value).zfill(OPCODE_LENGTH)
+    obj = types.SimpleNamespace(
+        token = tok,
+        tok_type = TOK_TYPE_OPCODE,
+        int_val = int_value,
+        hex_val = hex_value,
+        bin_val = bin_value
+    )
+
+    return obj
+
+def create_register_token_object(tok: str) -> object:
+    REGISTER_LENGTH = 3
+    TOK_TYPE_REGISTER = 'register'
+    int_value = utils.REGISTERS[tok]
+    hex_value = hex(int_value)
+    bin_value = utils.int_to_bin(int_value).zfill(REGISTER_LENGTH)
+    obj = types.SimpleNamespace(
+        token = tok,
+        tok_type = TOK_TYPE_REGISTER,
+        int_val = int_value,
+        hex_val = hex_value,
+        bin_val = bin_value
+    )
+
+    return obj
+
+def create_label_token_object(tok: str, label_lookup: dict) -> object:
+    TOK_TYPE_LABEL = 'label'
+    label_address = label_lookup[tok]
+    int_value = label_address
+    hex_value = hex(label_address)
+    bin_value = utils.int_to_bin(int_value)
+    obj = types.SimpleNamespace(
+        token = tok,
+        address = label_address,
+        tok_type = TOK_TYPE_LABEL,
+        int_val = int_value,
+        hex_val = hex_value,
+        bin_val = bin_value
+    )
+
+def create_imm5_token_object(tok: str) -> object:
+    TOK_TYPE_IMM5 = 'imm5'
 
 def createTokenObject(tok: str) -> object:
     int_value = utils.overall_dictionary[tok]
@@ -122,6 +176,7 @@ def pass1(code_to_parse: str) -> dict:
             # Create a key value pair of the hex'd address and the tokens in the line.
             address = hex(address_counter)
             symbol_table[address] = {
+                KEY_ADDRESS: address,
                 KEY_OPCODE : opcode,
                 KEY_OPERANDS : operands,
                 KEY_LABELS : labels
@@ -134,7 +189,8 @@ def pass1(code_to_parse: str) -> dict:
             # Increment the address_counter
             address_counter += 0x1
 
-    return symbol_table, label_lookup
+    obj_symbol_table = [Line(line, label_lookup) for line in symbol_table]
+    return obj_symbol_table, label_lookup
 
 def pass2(symbol_table, label_lookup):
     machine_code = ''
